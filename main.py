@@ -1,15 +1,16 @@
 import os
-import yaml
-
+import subprocess
 from argparse import ArgumentParser, Namespace
 from typing import Dict, Optional
 
-from src import FACADE, LOGGING, MESSAGES, SERVICES_FILES, SERVICES_NAMES
+import yaml
+
+from src import FACADE, LOGGING, MESSAGES, CONTROLLERS
 
 SERVICES_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "src")
 
 
-def main(args: Namespace, config: Dict):
+def main(args: Namespace, config: Dict, n: int):
     selected_service: Optional[str] = None
     if args.facade:
         if args.logging or args.messages:
@@ -24,11 +25,19 @@ def main(args: Namespace, config: Dict):
     else:
         raise ValueError("Specify one of --facade, --logging, --messages service to start")
 
-    start_cmd = f"uvicorn \
-        {SERVICES_FILES[selected_service]}:{SERVICES_NAMES[selected_service]} \
-        --host {config[selected_service]['host']} \
-        --port {config[selected_service]['port']}"
-    os.system(start_cmd)
+    # if there are many addresses, start the one with the given number(n)
+    starter = "uvicorn"
+    controller = f"{CONTROLLERS[selected_service]}:controller"
+
+    if isinstance(config[selected_service], list):
+        host = config[selected_service][n]['host']
+        port = config[selected_service][n]['port']
+    else:
+        host = config[selected_service]['host']
+        port = config[selected_service]['port']
+
+    start_cmd = f"{starter} {controller} --host {host} --port {port}"
+    subprocess.run(start_cmd, shell=True)
 
 
 if __name__ == "__main__":
@@ -39,6 +48,8 @@ if __name__ == "__main__":
     parser.add_argument("--facade", action="store_const", const=True, help="start facade service")
     parser.add_argument("--logging", action="store_const", const=True, help="start logging service")
     parser.add_argument("--messages", action="store_const", const=True, help="start messages service")
+    parser.add_argument("--number", "-n", type=int, required=False, default=0,
+                        help="Number of service in case of replication")
     args = parser.parse_args()
 
     config: Dict = yaml.load(open(args.config, 'r'), Loader=yaml.FullLoader)
@@ -48,4 +59,4 @@ if __name__ == "__main__":
     except Exception as exc:
         print(f"Is main.py in right directory? \n{exc}")
 
-    main(args, config)
+    main(args, config, args.number)

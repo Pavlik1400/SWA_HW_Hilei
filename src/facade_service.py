@@ -1,47 +1,38 @@
-from fastapi import FastAPI, Request, Response, status
-
-import uuid
-import requests
-import yaml
 import json
-import os
+import random
+import uuid
+from typing import Tuple
 
-from constants import LOGGING, MESSAGES
+import requests
 
-facade_service = FastAPI()
-
-CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "services_config.yml")
-config = yaml.load(open(CONFIG_PATH, 'r'), Loader=yaml.FullLoader)
-LOGGING_URI = f"http://{config[LOGGING]['host']}:{config[LOGGING]['port']}"
-MESSAGES_URI = f"http://{config[MESSAGES]['host']}:{config[MESSAGES]['port']}"
-
-
-@facade_service.post("/")
-async def post_message(message: Request):
-    body = await message.body()
-
-    logging_data = {
-        "uuid": str(uuid.uuid1()),
-        "message": body.decode()
-    }
-    logging_data = json.dumps(logging_data)
-    requests.post(LOGGING_URI, data=logging_data)
+from config import Config
+from constants import DEFAULT_CONFIG_PATH
+from logs import LOGGER
 
 
-@facade_service.get("/")
-async def get_message(response: Response):
-    try:
-        logging_response = requests.get(LOGGING_URI)
-        messages_response = requests.get(MESSAGES_URI)
-    except Exception as exc:
-        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-        return f"Error happened in internal communication between services: {exc}"
+class FacadeService:
+    def __init__(self, cnf_path: str = DEFAULT_CONFIG_PATH):
+        self.config = Config.from_cnf_path(cnf_path)
 
-    if logging_response.status_code != 200:
-        response.status_code = logging_response.status_code
-        return f"logging service failed with code: {logging_response.status_code}; error: {logging_response.text}"
-    elif messages_response.status_code != 200:
-        response.status_code = messages_response.status_code
-        return f"messages service failed with code: {messages_response.status_code}; error: {logging_response.text}"
+    def add_message(self, text: str):
+        LOGGER.info(f"FACADE: add_message({text})")
+        logging_data = {
+            "uuid": str(uuid.uuid1()),
+            "message": text
+        }
+        logging_data = json.dumps(logging_data)
+        logging_uri = random.choice(self.config.logging_uri)
+        requests.post(logging_uri, data=logging_data)
 
-    return f"{logging_response.text}: {messages_response.text}"
+    def get_messages(self) -> Tuple[int, str]:
+        LOGGER.info("FACADE: get_messages()")
+        logging_uri = random.choice(self.config.logging_uri)
+        logging_response = requests.get(logging_uri)
+        messages_response = requests.get(self.config.message_uri)
+
+        if logging_response.status_code != 200:
+            return logging_response.status_code, f"error in logging service: {logging_response.text}"
+        elif messages_response.status_code != 200:
+            return messages_response.status_code, f"error in message service: {messages_response.text}"
+
+        return 200, f"{logging_response.text}: {messages_response.text}"

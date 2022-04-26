@@ -1,8 +1,11 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
 from multiprocessing import Manager
 
-logging_service = FastAPI()
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+from logs import LOGGER
+
+controller = FastAPI()
 
 
 class Message(BaseModel):
@@ -14,12 +17,13 @@ manager = Manager()
 storage = manager.dict()
 
 
-@logging_service.post("/")
+@controller.post("/")
 def post_log(msg: Message):
-    print(f"Add {msg.uuid}  ->  {msg.message}")
+    LOGGER.info(f"LOGGING: Add {msg.uuid}  ->  {msg.message}")
     storage[msg.uuid] = msg.message
 
 
-@logging_service.get("/")
+@controller.get("/")
 def get_log():
+    LOGGER.info(f"LOGGING: get_logs()")
     return str(list(storage.values()))

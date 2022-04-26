@@ -1,8 +1,10 @@
 from fastapi import FastAPI
+from logs import LOGGER
 
-messages_service = FastAPI()
+controller = FastAPI()
 
 
-@messages_service.get("/")
+@controller.get("/")
 def get_messages():
+    LOGGER.info("MESSAGES: get_messages()")
     return "message-service is not implemented yet"
