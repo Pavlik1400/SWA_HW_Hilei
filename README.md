@@ -1,28 +1,7 @@
-# SWA course - HW1
+# SWA_HW2
 
-## Core libraries
-- [fastapi](https://fastapi.tiangolo.com/)
-- [requests](https://docs.python-requests.org/en/latest/)
+You can find in 'videos' a presentations where I present task 3, 4, 5, console outputs and how to use code in the repository
 
-## Prerequisities
-- [python](https://www.python.org/) 3.8+
-- [anaconda](https://docs.anaconda.com/anaconda/install/index.html)
-
-## Setup
-```
-conda env create -f environment.yml --name HW1
-conda activate HW1
-```
-
-## Usage
-```
-usage: main.py [-h] [--config CONFIG] [--facade] [--logging] [--messages]
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --config CONFIG, -c CONFIG
-                        config with ports
-  --facade              start facade service
-  --logging             start logging service
-  --messages            start messages service
-```
+- **Task 3 comments**: Hazelcast by default has guarantees that when 1 node dies, data is not lost. So as I show in the video, when I kill one instance - data is no lost. When I kill second instance after some time, enough to restore backup, data is also not lost. But when I kill 2 nodes quickly one after another - data is lost. 
+- **Task 4 comments**: No locking is not safe, and multi-processing counter doesn't work as expected. Optimistic/Pesimistic approaches can solve this problem.
+- **Task 5 comments**: When there are 2 consumers, they can read quicker than 1 producer produces data. When consumers are killed, after queue is filled, producer is locked. And vice versa - when producer is killed, consumers are locked until someone starts pushing to queue. Also I didn't find any pattern of how 2 consumers pull values from queue.

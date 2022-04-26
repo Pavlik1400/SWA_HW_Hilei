@@ -1,5 +1,0 @@
-{
-  facade: { host: "localhost", port: 8000 },
-  logging: { host: "localhost", port: 8001 },
-  messages: { host: "localhost", port: 8002 },
-}
