@@ -7,7 +7,8 @@ MESSAGES = "messages"
 
 CONTROLLERS = {
     FACADE: "facade_controller",
-    LOGGING: "logging_service",
+    # LOGGING: "logging_service",
+    LOGGING: "logging_service_hazelcast",
     MESSAGES: "messages_service",
 }
 

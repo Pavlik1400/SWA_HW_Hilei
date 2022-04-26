@@ -1,8 +1,10 @@
-import hazelcast
 import subprocess
+import os
 
+import hazelcast
 
-HZ_START_PATH = "./hz/bin/start.sh"
+HZ_START_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "hz", "bin", "start.sh")
+# HZ_START_PATH = "./hz/bin/start.sh"
 
 
 class HazelcasInstancetWrapper:
@@ -17,8 +19,9 @@ class HazelcasInstancetWrapper:
         # make sure instance is dead
         self.hz_proc.terminate()
 
+
+class HazelcastWrapper:
     @staticmethod
-    def newHazelCastInstance():
+    def newHazelCastInstance() -> HazelcasInstancetWrapper:
         proc = subprocess.Popen(HZ_START_PATH)
         return HazelcasInstancetWrapper(hz_proc=proc)
-
