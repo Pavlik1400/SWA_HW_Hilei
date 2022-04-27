@@ -4,7 +4,6 @@ import os
 import hazelcast
 
 HZ_START_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "hz", "bin", "start.sh")
-# HZ_START_PATH = "./hz/bin/start.sh"
 
 
 class HazelcasInstancetWrapper:

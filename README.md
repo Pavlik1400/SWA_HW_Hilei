@@ -1,8 +1,9 @@
-# SWA course - HW1
+# SWA course - HW3
 
 ## Core libraries
 - [fastapi](https://fastapi.tiangolo.com/)
 - [requests](https://docs.python-requests.org/en/latest/)
+- [hazelcast](https://hazelcast.com/clients/python-2/)
 
 ## Prerequisities
 - [python](https://www.python.org/) 3.8+
@@ -16,7 +17,7 @@ conda activate HW1
 
 ## Usage
 ```
-usage: main.py [-h] [--config CONFIG] [--facade] [--logging] [--messages]
+usage: main.py [-h] [--config CONFIG] [--facade] [--logging] [--messages] [--number NUMBER]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -25,4 +26,17 @@ optional arguments:
   --facade              start facade service
   --logging             start logging service
   --messages            start messages service
+  --number NUMBER, -n NUMBER
+                        Number of service in case of replication
 ```
+
+
+## Results:
+- Video with results: `./videos`
+
+### Screnshots
+Logs of all serices:
+![](./media/logs.png)
+
+Get request:
+![](./media/get_req.png)

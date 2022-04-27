@@ -1,8 +1,3 @@
-GET http://localhost:8000
-Accept: text/html
-###
-
-
 POST http://localhost:8000/
 Content-Type: application/json
 
@@ -51,3 +46,20 @@ Content-Type: application/json
 "msg8"
 
 ###
+POST http://localhost:8000
+Content-Type: application/json
+
+"msg9"
+
+###
+POST http://localhost:8000
+Content-Type: application/json
+
+"msg10"
+
+###
+
+GET http://localhost:8000
+Accept: text/html
+###
+

@@ -1,5 +1,3 @@
-from multiprocessing import Manager
-
 from fastapi import FastAPI
 from pydantic import BaseModel
 
@@ -13,9 +11,6 @@ class Message(BaseModel):
     uuid: str
     message: str
 
-
-# manager = Manager()
-# storage = manager.dict()
 
 hz_instance = HazelcastWrapper.newHazelCastInstance()
 log_messages = hz_instance.get_map("logging_map")
@@ -31,5 +26,6 @@ def post_log(msg: Message):
 @controller.get("/")
 def get_log():
     LOGGER.info(f"LOGGING: get_logs()")
-    return str(list(log_messages.values().result()))
-    # return str(list(storage.values()))
+    v = str(list(log_messages.values().result()))
+    LOGGER.debug(v)
+    return v
