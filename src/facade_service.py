@@ -16,11 +16,10 @@ class FacadeService:
 
     def add_message(self, text: str):
         LOGGER.info(f"FACADE: add_message({text})")
-        logging_data = {
+        logging_data = json.dumps({
             "uuid": str(uuid.uuid1()),
             "message": text.strip("\"")
-        }
-        logging_data = json.dumps(logging_data)
+        })
         logging_uri = random.choice(self.config.logging_uri)
         requests.post(logging_uri, data=logging_data)
 

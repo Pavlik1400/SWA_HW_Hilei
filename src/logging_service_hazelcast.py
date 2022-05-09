@@ -20,7 +20,6 @@ log_messages = hz_instance.get_map("logging_map")
 def post_log(msg: Message):
     LOGGER.info(f"LOGGING: Add {msg.uuid}  ->  {msg.message}")
     log_messages.put(msg.uuid, msg.message)
-    # storage[msg.uuid] = msg.message
 
 
 @controller.get("/")
