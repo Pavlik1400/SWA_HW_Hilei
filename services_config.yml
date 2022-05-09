@@ -3,8 +3,10 @@ facade:
     port: 8000
 
 messages:
-    host: "localhost"
-    port: 8001
+    - { host: "localhost", port: 8006 }
+    - { host: "localhost", port: 8005 }
+#     host: "localhost"
+#     port: 8001
 
 logging:
     - { host: "localhost", port: 8002 }

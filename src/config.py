@@ -1,7 +1,7 @@
 from typing import Dict, List, Union
 
 import yaml
-from constants import LOGGING, MESSAGES, FACADE, DEFAULT_CONFIG_PATH
+from constants import LOGGING, MESSAGES, FACADE, KAFKA, DEFAULT_CONFIG_PATH
 from dataclasses import dataclass
 
 
@@ -10,6 +10,7 @@ class Config:
     facade_uri: str
     logging_uri: str
     message_uri: str
+    kafka_uri: str
 
     @staticmethod
     def from_cnf_path(path: str = DEFAULT_CONFIG_PATH):
@@ -18,6 +19,7 @@ class Config:
             Config.__cnf_to_uri(config[FACADE]),
             Config.__cnf_to_uri(config[LOGGING]),
             Config.__cnf_to_uri(config[MESSAGES]),
+            Config.__cnf_to_uri(config[KAFKA]),
         )
 
     @staticmethod
@@ -26,6 +28,8 @@ class Config:
             return [f"http://{subaddr['host']}:{subaddr['port']}" for subaddr in addr]
         elif isinstance(addr, dict):
             return f"http://{addr['host']}:{addr['port']}"
+        elif isinstance(addr, str):
+            return addr
         else:
             raise ValueError("Bad 'addr' type")
 
