@@ -1,16 +1,18 @@
 import os
 import subprocess
 from argparse import ArgumentParser, Namespace
-from typing import Dict, Optional
+from typing import Optional
 
-import yaml
+import consul
 
 from src import FACADE, LOGGING, MESSAGES, CONTROLLERS
+from src.logs import LOGGER
+from src.utils import serialize, deserealize
 
 SERVICES_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "src")
 
 
-def main(args: Namespace, config: Dict, n: int):
+def main(args: Namespace):
     selected_service: Optional[str] = None
     if args.facade:
         if args.logging or args.messages:
@@ -29,34 +31,50 @@ def main(args: Namespace, config: Dict, n: int):
     starter = "uvicorn"
     controller = f"{CONTROLLERS[selected_service]}:controller"
 
-    if isinstance(config[selected_service], list):
-        host = config[selected_service][n]['host']
-        port = config[selected_service][n]['port']
-    else:
-        host = config[selected_service]['host']
-        port = config[selected_service]['port']
+    start_cmd = f"{starter} {controller} --host {args.host} --port {args.port}"
+    c = consul.Consul()
+    # if n is None, then serive starts in one instance
 
-    start_cmd = f"{starter} {controller} --host {host} --port {port}"
+    uri = f"http://{args.host}:{args.port}"
+    if args.n is None:
+        service_uri = serialize(uri)
+        LOGGER.debug(f"consule.put({selected_service}, {service_uri})")
+        c.kv.put(selected_service, service_uri)
+    else:
+        # if there is no list of uri, add it
+        uris = c.kv.get(selected_service)[1]
+
+        # if there is a dict, set value, else create new dict
+        name_to_uri = {
+            selected_service + f"_{args.n}": uri
+        }
+        if uris is None:
+            service_uris = serialize(name_to_uri)
+        else:
+            current_uris = deserealize(uris['Value'].decode('ascii'))
+            current_uris.update(name_to_uri)
+            service_uris = serialize(current_uris)
+        LOGGER.debug(f"consule.put({selected_service}, {service_uris})")
+        c.kv.put(selected_service, service_uris)
+
     subprocess.run(start_cmd, shell=True)
 
 
 if __name__ == "__main__":
     parser = ArgumentParser()
 
-    parser.add_argument("--config", "-c", type=str, required=False, help="config with ports",
-                        default="services_config.yml")
     parser.add_argument("--facade", action="store_const", const=True, help="start facade service")
     parser.add_argument("--logging", action="store_const", const=True, help="start logging service")
     parser.add_argument("--messages", action="store_const", const=True, help="start messages service")
-    parser.add_argument("--number", "-n", type=int, required=False, default=0,
+    parser.add_argument("-n", type=int, required=False, default=None,
                         help="Number of service in case of replication")
+    parser.add_argument("--host", type=str, default="localhost")
+    parser.add_argument("--port", type=int, default=8000)
     args = parser.parse_args()
-
-    config: Dict = yaml.load(open(args.config, 'r'), Loader=yaml.FullLoader)
 
     try:
         os.chdir(SERVICES_PATH)
     except Exception as exc:
         print(f"Is main.py in right directory? \n{exc}")
 
-    main(args, config, args.number)
+    main(args)

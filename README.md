@@ -31,17 +31,19 @@ optional arguments:
 ```
 
 ## Results:
-- logs of microservices:
-![](media/hw4/logs.png)
+- logs of microservices when starting:
+![](media/hw5/logs0.png)
+
+- logs of microservices after requests:
+![](media/hw5/logs1.png)
 
 - get facade request #1:
-![](media/hw4/get1.png)
-
-- get facade request #1:
-![](media/hw4/get1.png)
+![](media/hw5/get1.png)
 - 
-- get facade request #1:
-![](media/hw4/get1.png)
+- get facade request #:
+![](media/hw5/get2.png)
+
+- Video with starting all microservices, logs and requests - `./media/hw5/SWA_HW5_Pavlo_Hilei.mkv`
 
 
 [//]: # (## Results:)
