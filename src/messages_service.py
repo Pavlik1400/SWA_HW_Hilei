@@ -12,7 +12,12 @@ MSG_STORAGE = []
 
 
 def msg_loop():
-    msg_consumer = KafkaConsumer(KAFKA_MSG_TOPIC, bootstrap_servers=KAFKA_URI)
+    msg_consumer = KafkaConsumer(KAFKA_MSG_TOPIC,
+                                 group_id='my-group0',
+                                 bootstrap_servers=KAFKA_URI,
+                                 auto_offset_reset='earliest',
+                                 enable_auto_commit=True
+                                 )
     for msg in msg_consumer:
         m = msg.value.decode()
         print(f"Got message: {m}")

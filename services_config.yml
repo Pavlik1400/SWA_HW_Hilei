@@ -12,3 +12,5 @@ logging:
     - { host: "localhost", port: 8002 }
     - { host: "localhost", port: 8003 }
     - { host: "localhost", port: 8004 }
+
+kafka: "localhost:9092"

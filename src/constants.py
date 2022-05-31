@@ -4,7 +4,7 @@ import os
 FACADE = "facade"
 LOGGING = "logging"
 MESSAGES = "messages"
-KAFKA= "kafka"
+KAFKA = "kafka"
 
 CONTROLLERS = {
     FACADE: "facade_controller",

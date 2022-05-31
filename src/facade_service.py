@@ -26,7 +26,10 @@ class FacadeService:
         h = self.msg_producer.send(KAFKA_MSG_TOPIC, msg.encode('utf-8'))
         logging_uri = random.choice(self.config.logging_uri)
         requests.post(logging_uri, data=logging_data)
-        h.get(timeout=10)
+        metadata = h.get(timeout=10)
+        print(metadata.topic)
+        print(metadata.partition)
+        print(metadata.offset)
         self.msg_producer.flush()
 
     def get_messages(self) -> Tuple[int, str]:

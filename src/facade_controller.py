@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request, Response, status as fa_status
 
 from facade_service import FacadeService
+from logs import LOGGER
 
 controller = FastAPI()
 facade = FacadeService()
@@ -18,9 +19,12 @@ async def get_message(response: Response):
         status, resp = facade.get_messages()
     except Exception as exc:
         response.status_code = fa_status.HTTP_500_INTERNAL_SERVER_ERROR
-        return f"Error happened in internal communication between services: {exc}"
+        error_messae = f"Error happened in internal communication between services: {exc}"
+        LOGGER.error(error_messae)
+        return error_messae
 
     if status != fa_status.HTTP_200_OK:
+        LOGGER.warning(resp)
         response.status_code = status
         return resp
 
