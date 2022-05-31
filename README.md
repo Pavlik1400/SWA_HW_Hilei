@@ -17,18 +17,20 @@ conda activate HW1
 
 ## Usage
 ```
-usage: main.py [-h] [--config CONFIG] [--facade] [--logging] [--messages] [--number NUMBER]
+usage: main.py [-h] [--facade] [--logging] [--messages] [-n N] [--host HOST] [--port PORT]
 
 optional arguments:
-  -h, --help            show this help message and exit
-  --config CONFIG, -c CONFIG
-                        config with ports
-  --facade              start facade service
-  --logging             start logging service
-  --messages            start messages service
-  --number NUMBER, -n NUMBER
-                        Number of service in case of replication
+  -h, --help   show this help message and exit
+  --facade     start facade service
+  --logging    start logging service
+  --messages   start messages service
+  -n N         Number of service in case of replication
+  --host HOST
+  --port PORT
 ```
+
+- `./start_consul.sh` starts consul.io microservice
+- `./stop_consul.sh` stops consul.io microservice
 
 ## Results:
 - logs of microservices when starting:
