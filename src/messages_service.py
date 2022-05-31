@@ -3,7 +3,9 @@ import threading
 from fastapi import FastAPI
 from kafka import KafkaConsumer
 
-from constants import KAFKA_MSG_TOPIC, KAFKA_URI
+from constants import DEFAULT_KAFKA_CONFIG, KAFKA_CONFIG_KEY
+import consul
+from utils import get_or_set_default_consul
 from logs import LOGGER
 
 controller = FastAPI()
@@ -12,12 +14,15 @@ MSG_STORAGE = []
 
 
 def msg_loop():
-    msg_consumer = KafkaConsumer(KAFKA_MSG_TOPIC,
-                                 group_id='my-group0',
-                                 bootstrap_servers=KAFKA_URI,
-                                 auto_offset_reset='earliest',
-                                 enable_auto_commit=True
-                                 )
+    cons = consul.Consul()
+    kafka_cnf = get_or_set_default_consul(cons, key=KAFKA_CONFIG_KEY, default=DEFAULT_KAFKA_CONFIG)
+    msg_consumer = KafkaConsumer(
+        kafka_cnf['topic'],
+        group_id='my-group0',
+        bootstrap_servers=kafka_cnf['uri'],
+        auto_offset_reset='earliest',
+        enable_auto_commit=True
+    )
     for msg in msg_consumer:
         m = msg.value.decode()
         LOGGER.info(f"MESSAGE: Got message: {m}")

@@ -3,18 +3,25 @@ import random
 import uuid
 from typing import Tuple
 
+import consul
 import requests
 from kafka import KafkaProducer
 
-from config import Config
-from constants import DEFAULT_CONFIG_PATH, KAFKA_MSG_TOPIC, KAFKA_URI
+# from config import Config
+from constants import DEFAULT_KAFKA_CONFIG, LOGGING, MESSAGES, KAFKA_CONFIG_KEY
 from logs import LOGGER
+from utils import get_or_set_default_consul, deserealize
 
 
 class FacadeService:
-    def __init__(self, cnf_path: str = DEFAULT_CONFIG_PATH):
-        self.config = Config.from_cnf_path(cnf_path)
-        self.msg_producer = KafkaProducer(bootstrap_servers=KAFKA_URI)
+    def __init__(self):
+        self.c = consul.Consul()
+        self.kafka_config = get_or_set_default_consul(self.c, key=KAFKA_CONFIG_KEY, default=DEFAULT_KAFKA_CONFIG)
+        self.msg_producer = KafkaProducer(bootstrap_servers=self.kafka_config['uri'])
+
+    def __sample_uri(self, service: str):
+        uris = deserealize(self.c.kv.get(service)[1]['Value'].decode('ascii'))
+        return random.choice(list(uris.values()))
 
     def add_message(self, text: str):
         LOGGER.info(f"FACADE: add_message({text})")
@@ -23,20 +30,20 @@ class FacadeService:
             "uuid": str(uuid.uuid1()),
             "message": msg
         })
-        h = self.msg_producer.send(KAFKA_MSG_TOPIC, msg.encode('utf-8'))
-        logging_uri = random.choice(self.config.logging_uri)
+        h = self.msg_producer.send(self.kafka_config['topic'], msg.encode('utf-8'))
+
+        # now get loggine uris from consul, not config
+        logging_uri = self.__sample_uri(LOGGING)
+
         requests.post(logging_uri, data=logging_data)
-        metadata = h.get(timeout=10)
-        print(metadata.topic)
-        print(metadata.partition)
-        print(metadata.offset)
+        h.get(timeout=10)
         self.msg_producer.flush()
 
     def get_messages(self) -> Tuple[int, str]:
         LOGGER.info("FACADE: get_messages()")
-        logging_uri = random.choice(self.config.logging_uri)
+        logging_uri = self.__sample_uri(LOGGING)
         logging_response = requests.get(logging_uri)
-        message_uri = random.choice(self.config.message_uri)
+        message_uri = self.__sample_uri(MESSAGES)
         messages_response = requests.get(message_uri)
 
         if logging_response.status_code != 200:

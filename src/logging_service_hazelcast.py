@@ -3,6 +3,9 @@ from pydantic import BaseModel
 
 from hazelcast_wrapper import HazelcastWrapper
 from logs import LOGGER
+from constants import HAZELCAST_MAP_KEY, DEFAULT_HAZELCAST_MAP_NAME
+from utils import get_or_set_default_consul
+import consul
 
 controller = FastAPI()
 
@@ -12,8 +15,10 @@ class Message(BaseModel):
     message: str
 
 
+c = consul.Consul()
+logging_map_name = get_or_set_default_consul(c, key=HAZELCAST_MAP_KEY, default=DEFAULT_HAZELCAST_MAP_NAME)
 hz_instance = HazelcastWrapper.newHazelCastInstance()
-log_messages = hz_instance.get_map("logging_map")
+log_messages = hz_instance.get_map(logging_map_name)
 
 
 @controller.post("/")
