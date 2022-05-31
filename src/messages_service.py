@@ -20,7 +20,7 @@ def msg_loop():
                                  )
     for msg in msg_consumer:
         m = msg.value.decode()
-        print(f"Got message: {m}")
+        LOGGER.info(f"MESSAGE: Got message: {m}")
         MSG_STORAGE.append(m)
 
 

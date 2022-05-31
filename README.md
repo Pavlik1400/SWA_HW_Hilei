@@ -30,13 +30,32 @@ optional arguments:
                         Number of service in case of replication
 ```
 
-
 ## Results:
-- Video with results: `./videos`
+- logs of microservices:
+![](media/hw4/logs.png)
 
-### Screnshots
-Logs of all serices:
-![](./media/logs.png)
+- get facade request #1:
+![](media/hw4/get1.png)
 
-Get request:
-![](./media/get_req.png)
+- get facade request #1:
+![](media/hw4/get1.png)
+- 
+- get facade request #1:
+![](media/hw4/get1.png)
+
+
+[//]: # (## Results:)
+
+[//]: # (- Video with results: `./videos`)
+
+[//]: # ()
+[//]: # (### Screnshots)
+
+[//]: # (Logs of all serices:)
+
+[//]: # (![]&#40;./media/logs.png&#41;)
+
+[//]: # ()
+[//]: # (Get request:)
+
+[//]: # (![]&#40;./media/get_req.png&#41;)
